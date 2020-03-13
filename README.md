@@ -1,30 +1,21 @@
-Leaflet.SimpleGraticule
+Leaflet.AutoGraticule
 ------------
-A graticule for maps in Leaflet's L.CRS.Simple coordinate system. Code inspiration came from Jan Pieter Waagmeester's fantastic
-[Leaflet.Grid](https://github.com/jieter) for world projections. It is very similar in nature but assumes an infinite flat plane.
+A graticule for maps showing Latitude and Longitude, with automatic adjustment to the zoom level.
+
+Based on [Leaflet.SimpleGraticule](https://github.com/ablakey/Leaflet.SimpleGraticule).
 
 Usage
 -----
-Adding L.SimpleGraticule:
+Adding L.AutoGraticule:
 
 ```JavaScript
-var options = {interval: 20,
-               showOriginLabel: true,
-               redraw: 'move',
-               zoomIntervals: [
-                {start: 0, end: 3, interval: 50},
-                {start: 4, end: 5, interval: 5},
-                {start: 6, end: 20, interval: 1}
-            ]};
+var options = {
+    /** Leaflet map event on which to redraw the graticule. */
+    redraw: 'moveend',
 
-L.simpleGraticule(options).addTo(map);
+    /** Minimum distance in pixels between two graticule lines. */
+    minDistance: 100
+};
+
+L.autoGraticule(options).addTo(map);
 ```
-####Options:####
-- interval: The spacing in map units between horizontal and vertical lines.
-- showOriginLabel: true Whether or not to show '(0,0)' at the origin.
-- redraw: on which map event to redraw the graticule. On `move` is default but `moveend` can be smoother.
-- zoomIntervals: use different intervals in different zoom levels. If not specified, all zoom levels use value in interval option.
-
-Notes
------
-- This is my first open source contribution. I appreciate feedback on any topics!
