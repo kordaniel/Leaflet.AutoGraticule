@@ -4,6 +4,8 @@ A graticule for maps showing Latitude and Longitude, with automatic adjustment t
 
 Based on [Leaflet.SimpleGraticule](https://github.com/ablakey/Leaflet.SimpleGraticule).
 
+[Demo](https://facilmap.org/#3/0.00/0.00/MSfR-grid)
+
 Usage
 -----
 Adding L.AutoGraticule:
