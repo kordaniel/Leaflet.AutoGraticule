@@ -22,23 +22,7 @@ module.exports = (env, argv) => {
 					resource: { and: [ /\.ts/, [
 						__dirname + "/src/"
 					] ] },
-					use: [
-						/* {
-							loader: "babel-loader",
-							options: {
-								presets: [
-									[
-										"@babel/preset-env",
-										{
-											useBuiltIns: "usage",
-											corejs: 3
-										}
-									]
-								]
-							}
-						}, */
-						'ts-loader'
-					]
+					loader: "ts-loader"
 				},
 				{
 					test: /\.css$/,
