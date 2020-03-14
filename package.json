@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/FacilMap/Leaflet.AutoGraticule.git"
   },
+  "license": "BSD-2-Clause",
   "files": [
     "example.html",
     "dist",
