@@ -1,6 +1,8 @@
+import { Configuration } from "webpack";
+
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-module.exports = (env, argv) => {
+module.exports = (env: any, argv: any): Configuration => {
 	const isDev = argv.mode == "development";
 
 	return {
@@ -15,7 +17,7 @@ module.exports = (env, argv) => {
 			extensions: [ ".js", ".ts" ]
 		},
 		mode: isDev ? "development" : "production",
-		devtool: isDev ? "cheap-eval-source-map" : "source-map",
+		devtool: isDev ? "eval-cheap-source-map" : "source-map",
 		module: {
 			rules: [
 				{
