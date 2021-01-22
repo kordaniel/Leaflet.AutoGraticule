@@ -47,7 +47,7 @@ function bboxIntersect(bbox1: LatLngBounds | LatLngExpression[], bbox2: LatLngBo
     ]);
 }
 
-export interface Options extends LayerOptions {
+export interface AutoGraticuleOptions extends LayerOptions {
     redraw: keyof LeafletEventHandlerFnMap,
 
     /** Minimum distance between two lines in pixels */
@@ -56,7 +56,7 @@ export interface Options extends LayerOptions {
 
 export default class AutoGraticule extends L.LayerGroup {
 
-    options: Options = {
+    options: AutoGraticuleOptions = {
         redraw: 'moveend',
         minDistance: 100 // Minimum distance between two lines in pixels
     };
@@ -72,7 +72,7 @@ export default class AutoGraticule extends L.LayerGroup {
     _bounds!: LatLngBounds;
 
 
-    constructor(options?: Options) {
+    constructor(options?: Partial<AutoGraticuleOptions>) {
         super();
         L.Util.setOptions(this, options);
     }
@@ -202,15 +202,15 @@ export default class AutoGraticule extends L.LayerGroup {
 }
 
 declare module 'leaflet' {
-    function autoGraticule(options?: Options): AutoGraticule;
+    function autoGraticule(options?: Partial<AutoGraticuleOptions>): AutoGraticule;
 
     class AutoGraticule extends L.LayerGroup {
-        constructor(options?: Options);
+        constructor(options?: Partial<AutoGraticuleOptions>);
     }
 }
 
 L.AutoGraticule = AutoGraticule;
 
-L.autoGraticule = function autoGraticule(options?: Options) {
+L.autoGraticule = function autoGraticule(options?: Partial<AutoGraticuleOptions>) {
     return new L.AutoGraticule(options);
 };
