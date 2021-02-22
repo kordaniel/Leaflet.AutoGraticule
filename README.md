@@ -1,5 +1,6 @@
 Leaflet.AutoGraticule
-------------
+=====================
+
 A graticule for maps showing Latitude and Longitude, with automatic adjustment to the zoom level.
 
 Based on [Leaflet.SimpleGraticule](https://github.com/ablakey/Leaflet.SimpleGraticule).
@@ -9,7 +10,26 @@ Based on [Leaflet.SimpleGraticule](https://github.com/ablakey/Leaflet.SimpleGrat
 
 Usage
 -----
-Adding L.AutoGraticule:
+
+If you are using a module bundler, you can install Leaflet.AutoGraticule using `npm install -S leaflet-auto-graticule` and use it in your code like so:
+```javascript
+import AutoGraticule from "leaflet-auto-graticule";
+
+new AutoGraticule().addTo(map);
+```
+
+TypeScript is supported. Note that when including Leaflet.AutoGraticule like this, `L.AutoGraticule` is not available on the global `L` leaflet object. This allows module bundlers to use tree shaking.
+
+If you want to use Leaflet.AutoGraticule in a static HTML page, load it after Leaflet:
+```javascript
+<script src="https://unpkg.com/leaflet"></script>
+<script src="https://unpkg.com/leaflet-auto-graticule"></script>
+<script>
+    new L.AutoGraticule().addTo(map);
+</script>
+```
+
+## Options
 
 ```JavaScript
 var options = {
@@ -20,5 +40,5 @@ var options = {
     minDistance: 100
 };
 
-L.autoGraticule(options).addTo(map);
+new L.AutoGraticule(options).addTo(map);
 ```

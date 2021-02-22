@@ -1,52 +1,6 @@
 import L, { LatLngBounds, LatLngExpression, LayerOptions, LeafletEventHandlerFnMap, PolylineOptions, Map } from 'leaflet';
 import './L.AutoGraticule.css';
 
-function round(number: number, digits: number) {
-    const fac = Math.pow(10, digits);
-    return Math.round(number*fac)/fac;
-}
-
-function niceRound(number: number, variableDistance: boolean) {
-    if(number <= 0 || !isFinite(number))
-        throw "Invalid number " + number;
-    else {
-        if(variableDistance && number >= 5)
-            return 5;
-        if(number <= 10) {
-            let fac = 1;
-            while(number>1) { fac*=10; number/=10; }
-            while(number<=0.1) { fac/=10; number*=10; }
-
-            // Dist is now some number between 0.1 and 1, so we can round it conveniently and then multiply it again by fac to get back to the original dist
-
-            if(number == 0.1)
-                return round(0.1*fac, 12);
-            else if(number <= 0.2)
-                return round(0.2*fac, 12);
-            else if(number <= 0.5)
-                return round(0.5*fac, 12);
-            else
-                return fac;
-        } else if(number <= 30)
-            return 30;
-        else if(number <= 45)
-            return 45;
-        else if(number <= 60)
-            return 60;
-        else
-            return 90;
-    }
-}
-
-function bboxIntersect(bbox1: LatLngBounds | LatLngExpression[], bbox2: LatLngBounds | LatLngExpression[]) {
-    const bounds1 = bbox1 instanceof LatLngBounds ? bbox1 : L.latLngBounds(bbox1);
-    const bounds2 = bbox2 instanceof LatLngBounds ? bbox2 : L.latLngBounds(bbox2);
-    return L.latLngBounds([
-        [ Math.max(bounds1.getSouth(), bounds2.getSouth()), Math.max(bounds1.getWest(), bounds2.getWest())],
-        [ Math.min(bounds1.getNorth(), bounds2.getNorth()), Math.min(bounds1.getEast(), bounds2.getEast())]
-    ]);
-}
-
 export interface AutoGraticuleOptions extends LayerOptions {
     redraw: keyof LeafletEventHandlerFnMap,
 
@@ -110,23 +64,23 @@ export default class AutoGraticule extends L.LayerGroup {
         const zoom = this._map.getZoom();
 
         // Fix drawing of lines outside of bounds
-        this._bounds = bboxIntersect(bounds, [[-85, -180], [85, 180]]);
+        this._bounds = AutoGraticule.bboxIntersect(bounds, [[-85, -180], [85, 180]]);
 
         // Fix drawing of labels outside of bounds
         const getBoundsBkp = this._map.getBounds;
         try {
             this._map.getBounds = function() {
-                return bboxIntersect(getBoundsBkp.apply(this), [[-85, -180], [85, 180]])
+                return AutoGraticule.bboxIntersect(getBoundsBkp.apply(this), [[-85, -180], [85, 180]])
             };
 
             // Longitude
             const center = this._map.project(bounds.getCenter(), zoom);
-            const dist = niceRound(round(this._map.unproject(center.add([ this.options.minDistance / 2, 0 ]), zoom).lng - this._map.unproject(center.subtract([ this.options.minDistance / 2, 0 ]), zoom).lng, 12), false);
+            const dist = AutoGraticule.niceRound(AutoGraticule.round(this._map.unproject(center.add([ this.options.minDistance / 2, 0 ]), zoom).lng - this._map.unproject(center.subtract([ this.options.minDistance / 2, 0 ]), zoom).lng, 12), false);
             const west = Math.max(bounds.getWest(), -180);
             const east = Math.min(bounds.getEast(), 180);
-            for (let lng = Math.ceil(round(west/dist, 12))*dist; lng <= east; lng+=dist) {
+            for (let lng = Math.ceil(AutoGraticule.round(west/dist, 12))*dist; lng <= east; lng+=dist) {
                 this.addLayer(this.buildXLine(lng));
-                this.addLayer(this.buildLabel('gridlabel-horiz', round(lng, 12)));
+                this.addLayer(this.buildLabel('gridlabel-horiz', AutoGraticule.round(lng, 12)));
             }
 
             // Latitude
@@ -137,8 +91,8 @@ export default class AutoGraticule extends L.LayerGroup {
                     const point = this._map.project([ lat, bounds.getCenter().lng ], zoom);
                     const point2LatLng = this._map.unproject(point.subtract([ 0, this.options.minDistance ]), zoom);
 
-                    const dist = niceRound(round(point2LatLng.lat - lat, 12), true);
-                    lat = round(first ? Math.ceil(round(lat/dist, 12))*dist : Math.ceil(round(point2LatLng.lat/dist, 12))*dist, 2);
+                    const dist = AutoGraticule.niceRound(AutoGraticule.round(point2LatLng.lat - lat, 12), true);
+                    lat = AutoGraticule.round(first ? Math.ceil(AutoGraticule.round(lat/dist, 12))*dist : Math.ceil(AutoGraticule.round(point2LatLng.lat/dist, 12))*dist, 2);
 
                     first = false;
 
@@ -153,8 +107,8 @@ export default class AutoGraticule extends L.LayerGroup {
                     const point = this._map.project([ lat, bounds.getCenter().lng ], zoom);
                     const point2LatLng = this._map.unproject(point.add([ 0, this.options.minDistance ]), zoom);
 
-                    const dist = niceRound(round(lat - point2LatLng.lat, 12), true);
-                    lat = round(first ? Math.floor(round(lat/dist, 12))*dist : Math.floor(round(point2LatLng.lat/dist, 12))*dist, 2);
+                    const dist = AutoGraticule.niceRound(AutoGraticule.round(lat - point2LatLng.lat, 12), true);
+                    lat = AutoGraticule.round(first ? Math.floor(AutoGraticule.round(lat/dist, 12))*dist : Math.floor(AutoGraticule.round(point2LatLng.lat/dist, 12))*dist, 2);
 
                     first = false;
 
@@ -199,18 +153,50 @@ export default class AutoGraticule extends L.LayerGroup {
             })
         });
     }
-}
 
-declare module 'leaflet' {
-    function autoGraticule(options?: Partial<AutoGraticuleOptions>): AutoGraticule;
-
-    class AutoGraticule extends L.LayerGroup {
-        constructor(options?: Partial<AutoGraticuleOptions>);
+    static round(number: number, digits: number) {
+        const fac = Math.pow(10, digits);
+        return Math.round(number*fac)/fac;
+    }
+    
+    static niceRound(number: number, variableDistance: boolean) {
+        if(number <= 0 || !isFinite(number))
+            throw "Invalid number " + number;
+        else {
+            if(variableDistance && number >= 5)
+                return 5;
+            if(number <= 10) {
+                let fac = 1;
+                while(number>1) { fac*=10; number/=10; }
+                while(number<=0.1) { fac/=10; number*=10; }
+    
+                // Dist is now some number between 0.1 and 1, so we can round it conveniently and then multiply it again by fac to get back to the original dist
+    
+                if(number == 0.1)
+                    return AutoGraticule.round(0.1*fac, 12);
+                else if(number <= 0.2)
+                    return AutoGraticule.round(0.2*fac, 12);
+                else if(number <= 0.5)
+                    return AutoGraticule.round(0.5*fac, 12);
+                else
+                    return fac;
+            } else if(number <= 30)
+                return 30;
+            else if(number <= 45)
+                return 45;
+            else if(number <= 60)
+                return 60;
+            else
+                return 90;
+        }
+    }
+    
+    static bboxIntersect(bbox1: LatLngBounds | LatLngExpression[], bbox2: LatLngBounds | LatLngExpression[]) {
+        const bounds1 = bbox1 instanceof LatLngBounds ? bbox1 : L.latLngBounds(bbox1);
+        const bounds2 = bbox2 instanceof LatLngBounds ? bbox2 : L.latLngBounds(bbox2);
+        return L.latLngBounds([
+            [ Math.max(bounds1.getSouth(), bounds2.getSouth()), Math.max(bounds1.getWest(), bounds2.getWest())],
+            [ Math.min(bounds1.getNorth(), bounds2.getNorth()), Math.min(bounds1.getEast(), bounds2.getEast())]
+        ]);
     }
 }
-
-L.AutoGraticule = AutoGraticule;
-
-L.autoGraticule = function autoGraticule(options?: Partial<AutoGraticuleOptions>) {
-    return new L.AutoGraticule(options);
-};

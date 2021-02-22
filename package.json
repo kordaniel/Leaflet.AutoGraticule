@@ -1,9 +1,10 @@
 {
   "name": "leaflet-auto-graticule",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Leaflet graticule with automatic adaption to zoom level.",
   "main": "./dist/L.AutoGraticule.js",
   "types": "./dist/L.AutoGraticule.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/FacilMap/Leaflet.AutoGraticule.git"
