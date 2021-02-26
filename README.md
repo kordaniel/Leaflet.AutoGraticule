@@ -18,7 +18,7 @@ import AutoGraticule from "leaflet-auto-graticule";
 new AutoGraticule().addTo(map);
 ```
 
-TypeScript is supported. Note that when including Leaflet.AutoGraticule like this, `L.AutoGraticule` is not available on the global `L` leaflet object. This allows module bundlers to use tree shaking.
+TypeScript is supported. Note that when including Leaflet.AutoGraticule like this, `L.AutoGraticule` is not available on the global `L` leaflet object.
 
 If you want to use Leaflet.AutoGraticule in a static HTML page, load it after Leaflet:
 ```javascript
