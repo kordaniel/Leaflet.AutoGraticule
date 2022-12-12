@@ -1,4 +1,4 @@
-import L, { LatLngBounds, LatLngExpression, LayerOptions, LeafletEventHandlerFnMap, PolylineOptions, Map } from 'leaflet';
+import { LatLngBounds, LatLngExpression, LayerOptions, LeafletEventHandlerFnMap, PolylineOptions, Map, LayerGroup, Util, Polyline, LatLng, marker, divIcon, latLngBounds } from 'leaflet';
 import './L.AutoGraticule.css';
 
 export interface AutoGraticuleOptions extends LayerOptions {
@@ -8,7 +8,7 @@ export interface AutoGraticuleOptions extends LayerOptions {
     minDistance: number
 }
 
-export default class AutoGraticule extends L.LayerGroup {
+export default class AutoGraticule extends LayerGroup {
 
     options: AutoGraticuleOptions = {
         redraw: 'moveend',
@@ -28,7 +28,7 @@ export default class AutoGraticule extends L.LayerGroup {
 
     constructor(options?: Partial<AutoGraticuleOptions>) {
         super();
-        L.Util.setOptions(this, options);
+        Util.setOptions(this, options);
     }
 
 
@@ -121,32 +121,32 @@ export default class AutoGraticule extends L.LayerGroup {
         }
     }
 
-    buildXLine(x: number): L.Polyline {
-        const bottomLL = new L.LatLng(this._bounds.getSouth(), x);
-        const topLL = new L.LatLng(this._bounds.getNorth(), x);
+    buildXLine(x: number): Polyline {
+        const bottomLL = new LatLng(this._bounds.getSouth(), x);
+        const topLL = new LatLng(this._bounds.getNorth(), x);
 
-        return new L.Polyline([bottomLL, topLL], this.lineStyle);
+        return new Polyline([bottomLL, topLL], this.lineStyle);
     }
 
     buildYLine(y: number): L.Polyline {
-        const leftLL = new L.LatLng(y, this._bounds.getWest());
-        const rightLL = new L.LatLng(y, this._bounds.getEast());
+        const leftLL = new LatLng(y, this._bounds.getWest());
+        const rightLL = new LatLng(y, this._bounds.getEast());
 
-        return new L.Polyline([leftLL, rightLL], this.lineStyle);
+        return new Polyline([leftLL, rightLL], this.lineStyle);
     }
 
     buildLabel(axis: 'gridlabel-horiz' | 'gridlabel-vert', val: number) {
         const bounds = this._map.getBounds().pad(-0.003);
-        let latLng: L.LatLng;
+        let latLng: LatLng;
         if (axis == 'gridlabel-horiz') {
-            latLng = new L.LatLng(bounds.getNorth(), val);
+            latLng = new LatLng(bounds.getNorth(), val);
         } else {
-            latLng = new L.LatLng(val, bounds.getWest());
+            latLng = new LatLng(val, bounds.getWest());
         }
 
-        return L.marker(latLng, {
+        return marker(latLng, {
             interactive: false,
-            icon: L.divIcon({
+            icon: divIcon({
                 iconSize: [0, 0],
                 className: 'leaflet-grid-label',
                 html: '<div class="' + axis + '">' + val + '&#8239;°</div>'
@@ -158,7 +158,7 @@ export default class AutoGraticule extends L.LayerGroup {
         const fac = Math.pow(10, digits);
         return Math.round(number*fac)/fac;
     }
-    
+
     static niceRound(number: number, variableDistance: boolean) {
         if(number <= 0 || !isFinite(number))
             throw "Invalid number " + number;
@@ -169,9 +169,9 @@ export default class AutoGraticule extends L.LayerGroup {
                 let fac = 1;
                 while(number>1) { fac*=10; number/=10; }
                 while(number<=0.1) { fac/=10; number*=10; }
-    
+
                 // Dist is now some number between 0.1 and 1, so we can round it conveniently and then multiply it again by fac to get back to the original dist
-    
+
                 if(number == 0.1)
                     return AutoGraticule.round(0.1*fac, 12);
                 else if(number <= 0.2)
@@ -190,11 +190,11 @@ export default class AutoGraticule extends L.LayerGroup {
                 return 90;
         }
     }
-    
+
     static bboxIntersect(bbox1: LatLngBounds | LatLngExpression[], bbox2: LatLngBounds | LatLngExpression[]) {
-        const bounds1 = bbox1 instanceof LatLngBounds ? bbox1 : L.latLngBounds(bbox1);
-        const bounds2 = bbox2 instanceof LatLngBounds ? bbox2 : L.latLngBounds(bbox2);
-        return L.latLngBounds([
+        const bounds1 = bbox1 instanceof LatLngBounds ? bbox1 : latLngBounds(bbox1);
+        const bounds2 = bbox2 instanceof LatLngBounds ? bbox2 : latLngBounds(bbox2);
+        return latLngBounds([
             [ Math.max(bounds1.getSouth(), bounds2.getSouth()), Math.max(bounds1.getWest(), bounds2.getWest())],
             [ Math.min(bounds1.getNorth(), bounds2.getNorth()), Math.min(bounds1.getEast(), bounds2.getEast())]
         ]);
