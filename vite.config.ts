@@ -28,5 +28,8 @@ export default defineConfig({
 		alias: {
 			'leaflet-auto-graticule': './src/L.AutoGraticule.ts'
 		}
+	},
+	test: {
+		environment: 'jsdom'
 	}
 });
