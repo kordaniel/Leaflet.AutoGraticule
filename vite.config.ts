@@ -6,7 +6,7 @@ import dtsPlugin from 'vite-plugin-dts';
 export default defineConfig({
 	plugins: [
 		cssInjectedByJsPlugin(),
-		dtsPlugin()
+		dtsPlugin({ rollupTypes: true })
 	],
 	build: {
 		sourcemap: true,
@@ -14,7 +14,8 @@ export default defineConfig({
 		lib: {
 			entry: './src/L.AutoGraticule.ts',
 			name: 'L.AutoGraticule',
-			fileName: (format) => `L.AutoGraticule.${format === 'umd' ? 'js' : 'mjs'}`
+			fileName: () => "L.AutoGraticule.js",
+			formats: ["es"]
 		},
 		rollupOptions: {
 			output: {
