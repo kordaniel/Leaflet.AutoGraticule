@@ -18,12 +18,7 @@ export default defineConfig({
 			formats: ["es"]
 		},
 		rollupOptions: {
-			output: {
-				globals: {
-					'leaflet': 'L'
-				}
-			},
-			external: ['leaflet']
+			external: (id) => !id.startsWith("./") && !id.startsWith("../") && /* resolved internal modules */ !id.startsWith("/")
 		}
 	},
 	resolve: {
