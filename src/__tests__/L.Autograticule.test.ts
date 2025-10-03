@@ -48,3 +48,35 @@ test('niceRound', () => {
     expect(AutoGraticule.getGridDivisor(5.1, true)).toBe(5);
     expect(AutoGraticule.getGridDivisor(5, true)).toBe(5);
 });
+
+test('decimalLatLngToDMSStr', () => {
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -180.00)).toBe("180°00'00.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -100.00)).toBe("100°00'00.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -13.37331)).toBe("13°22'23.92''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -13.37)).toBe("13°22'12.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -5.00)).toBe("05°00'00.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -1.00)).toBe("01°00'00.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -0.10)).toBe("00°06'00.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -0.01)).toBe("00°00'36.00''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', -0.001)).toBe("00°00'03.60''W");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 0.00)).toBe("00°00'00.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 0.001)).toBe("00°00'03.60''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 0.01)).toBe("00°00'36.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 0.10)).toBe("00°06'00.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 1.00)).toBe("01°00'00.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 5.00)).toBe("05°00'00.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 13.37)).toBe("13°22'12.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 13.37331)).toBe("13°22'23.92''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 100.00)).toBe("100°00'00.00''E");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-horiz', 180.00)).toBe("180°00'00.00''E");
+
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', -85.05115)).toBe("85°03'04.14''S");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', -13.020381)).toBe("13°01'13.37''S");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', -10.23456)).toBe("10°14'04.42''S");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', -0.00002)).toBe("00°00'00.07''S");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', 0.00)).toBe("00°00'00.00''N");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', 0.00002)).toBe("00°00'00.07''N");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', 10.23456)).toBe("10°14'04.42''N");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', 13.020381)).toBe("13°01'13.37''N");
+    expect(AutoGraticule.decimalLatLngToDMSStr('gridlabel-vert', 85.00)).toBe("85°00'00.00''N");
+});

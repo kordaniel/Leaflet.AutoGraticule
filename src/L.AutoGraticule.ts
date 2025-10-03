@@ -6,21 +6,36 @@ export interface AutoGraticuleOptions extends LayerOptions {
 
     /** Minimum distance between two lines in pixels */
     minDistance: number
+
+    /**
+     * Format of rendered graticule lines degrees, options:
+     *  - degrees: Decimal degrees, examples: -13.37°, 0.1°,
+     *  - dms: Degrees-Minutes-Seconds, examples: 13°22'12.00''W, 00°00'36.00''E
+    */
+    labelFormat: 'dms' | 'degrees'
+
+    /**
+     * Size of rendered graticule degrees, large == font-size: 1.25em
+     */
+    labelSize: 'normal' | 'large'
+
+    lineStyle: Partial<PolylineOptions>;
 }
 
 export default class AutoGraticule extends LayerGroup {
 
     options: AutoGraticuleOptions = {
         redraw: 'moveend',
-        minDistance: 100 // Minimum distance between two lines in pixels
-    };
-
-    lineStyle: PolylineOptions = {
-        stroke: true,
-        color: '#111',
-        opacity: 0.6,
-        weight: 1,
-        interactive: false
+        minDistance: 100, // Minimum distance between two lines in pixels
+        labelFormat: 'degrees',
+        labelSize: 'normal',
+        lineStyle: {
+            stroke: true,
+            color: '#111',
+            opacity: 0.6,
+            weight: 1,
+            interactive: false
+        }
     };
 
     _bounds!: LatLngBounds;
@@ -28,7 +43,13 @@ export default class AutoGraticule extends LayerGroup {
 
     constructor(options?: Partial<AutoGraticuleOptions>) {
         super();
-        Util.setOptions(this, options);
+        Util.setOptions(this, {
+            ...options,
+            lineStyle: {
+                ...this.options.lineStyle,
+                ...options?.lineStyle
+            }
+        });
     }
 
 
@@ -129,33 +150,59 @@ export default class AutoGraticule extends LayerGroup {
         const bottomLL = new LatLng(this._bounds.getSouth(), x);
         const topLL = new LatLng(this._bounds.getNorth(), x);
 
-        return new Polyline([bottomLL, topLL], this.lineStyle);
+        return new Polyline([bottomLL, topLL], this.options.lineStyle);
     }
 
     buildYLine(y: number): L.Polyline {
         const leftLL = new LatLng(y, this._bounds.getWest());
         const rightLL = new LatLng(y, this._bounds.getEast());
 
-        return new Polyline([leftLL, rightLL], this.lineStyle);
+        return new Polyline([leftLL, rightLL], this.options.lineStyle);
     }
 
     buildLabel(axis: 'gridlabel-horiz' | 'gridlabel-vert', val: number) {
         const bounds = this._map.getBounds().pad(-0.003);
         let latLng: LatLng;
+        let label: string;
+
         if (axis == 'gridlabel-horiz') {
             latLng = new LatLng(bounds.getNorth(), val);
         } else {
             latLng = new LatLng(val, bounds.getWest());
         }
 
+        if (this.options.labelFormat === 'degrees') {
+            label = `${val}&#8239;°`;
+        } else if (this.options.labelFormat === 'dms') {
+            label = AutoGraticule.decimalLatLngToDMSStr(axis, val);
+        } else {
+            throw new Error(`Unhandled labelFormat setting: ${this.options.labelFormat}`);
+        }
+
+        const className = this.options.labelSize === 'normal' ? 'leaflet-grid-label' : 'leaflet-grid-label-large';
+        const divClass = this.options.labelSize === 'normal' ? axis : `${axis}-large`;
         return marker(latLng, {
             interactive: false,
             icon: divIcon({
                 iconSize: [0, 0],
-                className: 'leaflet-grid-label',
-                html: '<div class="' + axis + '">' + val + '&#8239;°</div>'
+                className,
+                html: '<div class="' + divClass + '">' + label + '</div>'
             })
         });
+    }
+
+    static decimalLatLngToDMSStr(axis: 'gridlabel-horiz' | 'gridlabel-vert', val: number) {
+        const suffix = axis === 'gridlabel-horiz'
+            ? val < 0 ? 'W' : 'E'
+            : val < 0 ? 'S' : 'N';
+
+        const decimalAbsDegrees = Math.abs(val);
+        const degrees = Math.trunc(decimalAbsDegrees);
+        const fraction = decimalAbsDegrees - degrees;
+        const minutes = Math.trunc(fraction * 60);
+        const seconds = (fraction - minutes / 60) * Math.pow(60, 2);
+
+        return `${degrees.toString().padStart(2, '0')}°${minutes.toString().padStart(2, '0')}'${seconds.toFixed(2).padStart(5, '0')}''${suffix}`;
     }
 
     /**

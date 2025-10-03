@@ -45,14 +45,38 @@ If you want to use Leaflet.AutoGraticule directly inside a website without using
 ```
 
 ## Options
-
+All options are optional and any passed option will override the corresponding default option listed below.
 ```javascript
 const options = {
     /** Leaflet map event on which to redraw the graticule. */
     redraw: 'moveend',
 
     /** Minimum distance in pixels between two graticule lines. */
-    minDistance: 100
+    minDistance: 100,
+
+    /** Format of labels for every graticule, options:
+     *  - degrees - Decimal degrees, examples: -13.37°, 0.1°,
+     *  - dms - Degrees-Minutes-Seconds, examples: 13°22'12.00''W, 00°00'36.00''E
+     */
+    labelFormat: 'degrees',
+
+    /** Size of rendered graticule labels, options:
+     * - normal
+     * - large - css font-size: 1.25em
+     */
+    labelSize: 'normal',
+
+    /** Style for graticule lines, accepts a Partial<L.PolylineOptions> object.
+     *  Overrides the default values with the provided fields, while keeping
+     *  defaults for all unspecified fields.
+     */
+    lineStyle: {
+        stroke: true,
+        color: '#111',
+        opacity: 0.6,
+        weight: 1,
+        interactive: false
+    }
 };
 
 new L.AutoGraticule(options).addTo(map);
