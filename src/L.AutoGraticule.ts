@@ -8,8 +8,8 @@ export interface AutoGraticuleOptions extends LayerOptions {
     minDistance: number
 
     /**
-     * Format of rendered graticule lines degrees, options:
-     *  - degrees: Decimal degrees, examples: -13.37°, 0.1°,
+     * Format of labels for every graticule, options:
+     *  - degrees: Decimal degrees, examples: -13.37°, 0.1°
      *  - dms: Degrees-Minutes-Seconds, examples: 13°22'12.00''W, 00°00'36.00''E
     */
     labelFormat: 'dms' | 'degrees'
@@ -162,6 +162,7 @@ export default class AutoGraticule extends LayerGroup {
 
     buildLabel(axis: 'gridlabel-horiz' | 'gridlabel-vert', val: number) {
         const bounds = this._map.getBounds().pad(-0.003);
+        let className: string = 'leaflet-grid-label';
         let latLng: LatLng;
         let label: string;
 
@@ -179,14 +180,16 @@ export default class AutoGraticule extends LayerGroup {
             throw new Error(`Unhandled labelFormat setting: ${this.options.labelFormat}`);
         }
 
-        const className = this.options.labelSize === 'normal' ? 'leaflet-grid-label' : 'leaflet-grid-label-large';
-        const divClass = this.options.labelSize === 'normal' ? axis : `${axis}-large`;
+        if (this.options.labelSize === 'large') {
+            className += ' leaflet-grid-label-large';
+        }
+
         return marker(latLng, {
             interactive: false,
             icon: divIcon({
                 iconSize: [0, 0],
                 className,
-                html: '<div class="' + divClass + '">' + label + '</div>'
+                html: '<div class="' + axis + '">' + label + '</div>'
             })
         });
     }
